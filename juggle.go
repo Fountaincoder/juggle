@@ -11,7 +11,7 @@ import (
 )
 type Tuple struct {
     Delta  uint8
-    Count  uint8
+    Count  uint32
 }
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
     defer file.Close()
 
     //build the histogram frequency table
-	frequencyMap := make(map[uint16]uint8)
+	frequencyMap := make(map[uint16]uint32)
     // Use a scanner to read the file line by line
     scanner := bufio.NewScanner(file)
     for scanner.Scan() {
@@ -48,9 +48,8 @@ func main() {
         }
         //read into the frequency map
         frequencyMap[uint16(num)]++
-        
+   
     }
-
 	//keys is eventually used to produce the delta encoding
     var keys []uint16
        

@@ -11,7 +11,7 @@ import (
 
 type Tuple struct {
     Delta  uint8
-    Count  uint8
+    Count  uint32
 }
 
 func main() {
@@ -56,7 +56,6 @@ func main() {
     var out_data []uint16	    
 
     keys2 := deltaDecode(deltas)
-	fmt.Println(len(keys2))
     for i,key := range keys2 {
     	count := tuples[i].Count
     	for j :=0 ; j < int(count) ; j++{
