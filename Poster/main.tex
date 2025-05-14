@@ -1,0 +1,193 @@
+\documentclass[a0paper,fleqn]{betterposter}
+\usepackage{verbatim}
+%%%% Uncomment the following commands to customise the format
+
+%% Setting the width of columns
+% Left column
+\setlength{\leftbarwidth}{0.3\paperwidth}
+% Right column
+\setlength{\rightbarwidth}{0.3\paperwidth}
+
+%% Changing font sizes
+% Text font
+\renewcommand{\fontsizestandard}{\fontsize{28}{50} \selectfont}
+% Main column font
+\renewcommand{\fontsizemain}{\fontsize{72}{95} \selectfont}
+\renewcommand{\fontsizesection}{\fontsize{28}{35} \selectfont}
+
+
+\begin{document}	
+\betterposter{
+
+\maincolumn{
+
+\begin{center}
+    \scalebox{1}{
+    \textbf{Compressing Random Sources}} \
+
+\end{center}
+\begin{center}
+    \scalebox{0.7}{
+    \textbf{Uniform Random (16bit) }} \
+
+\end{center}
+\scalebox{2.9}{\begin{huge}
+
+    
+    \begin{tabular}{|r|r|r|r|}
+        \hline
+        \textbf{No. Values} & \textbf{gzip} & \textbf{bzip2} & \textbf{juggle} \\
+        \hline
+        10,000 & 28kB & 24kB & 47kB \\
+        100,000 & 264kB & 223kB & 256kB \\
+        1,000,000 & 2.6MB & 2.2MB & 328kB \\
+        \hline
+    \end{tabular}
+    \end{huge}
+    }
+\vspace{1cm} 
+\begin{center}
+    \scalebox{0.7}{\textbf{Bent Coin $p=0.7$}} \
+
+\end{center}
+
+\scalebox{2.9}{\begin{huge}
+
+     \begin{tabular}{|r|r|r|r|}
+        \hline
+        \textbf{No. Values} & \textbf{gzip} & \textbf{bzip2} & \textbf{juggle} \\
+        \hline
+        10,000 & 1.9kB & 1.5kB & 10B \\
+        100,000 & 18kB & 14kB & 10B \\
+        1,000,000 & 179kB & 144kB & 10B \\
+        \hline
+    \end{tabular}
+    \end{huge}
+    }
+\vspace{1cm}    
+\begin{center}
+    \scalebox{0.7}{\textbf{Gaussian $\mu=100$  $\sigma=15$}} \
+\end{center}
+
+\scalebox{2.9}{\begin{huge}    
+    \begin{tabular}{|r|r|r|r|}
+        \hline
+        \textbf{No. Values} & \textbf{gzip} & \textbf{bzip2} & \textbf{juggle} \\
+        \hline
+        10,000 & 11kB & 8.2kB & 520B \\
+        100,000 & 107kB & 80kB & 610B \\
+        1,000,000 & 1.1MB & 802kB & 690B \\
+        \hline
+    \end{tabular}
+\end{huge}
+}
+\vfill
+}{
+\vfill
+%%%% Bottom space
+%% QR code img/qrcode
+\QRcode{https://github.com/fountaincoder/juggle}{img/smartphoneWhite}{
+\textbf{Scan the QR code for the open source library
+}
+}
+% Smartphone icon
+% Author: Freepik
+% Retrieved from: https://www.flaticon.com/free-icon/smartphone_65680
+
+%% Compact QR code (comment the previous command and uncomment this one to switch)
+%\compactqrcode{img/qrcode}{
+%\textbf{Take a picture} to
+%\\download the full paper
+%}
+
+}
+
+}{
+%%%%%%%% LEFT COLUMN
+\title{JUGGLE: A Simple Lossless Compression Algorithm for Multi-sets}
+\author{Jonny Edwards}
+\institution{University of York, Non-standard Compute Group}\\
+\email{jde500@york.ac.uk}
+\section{Problem}
+Compression algorithms are a central part of the compute storage landscape, playing a vital role in the management and manipulation of large amounts of data. Tools in this space tend to be mature, with tried and tested algorithms. This is particularly the case with \texttt{gzip} \cite{rfc1952} and \texttt{bzip2}\footnote{\huge https://github.com/devkitPro/bzip2}, which achieve good compression on general data-sources \cite{MacKay:2002:ITI:971143}. Implicit, and not often stated, is that the compressed data maintains the same order, so data is decompressed to exactly the same sequence as in the original source. When we relax this requirement, making order non-implicit, we can compress sources more heavily, and this can lead to compression \textit{below} the Shannon limit. The developments discussed in this poster relax this order constraint, by compressing multi-sets using a simple delta-encoded histogram.  
+
+\section{Numerical Multi-sets}
+A multi-set is a generalization of a set, that allows for multiple occurrences of the same element. The number of occurrences of an element is called its multiplicity, and the order of returned values is not explicit. A small example of this type of data-set is  $[42, 8, 199, 78, 42]$ where the value $42$ is repeated twice. The goal of compressing multi-sets is to return the set in any order, so that the set contents are communicated.
+
+\section{Experimental Setup}
+To assess performance experimentally, we built a corresponding \textt{Unix} tool in go \footnote{\huge https://go.dev/} which performed compression and decompression. Compression was performed on a selection of numerical data files, sampled in a variety of ways. The results were then compared to the standard \texttt{Unix} tools of  \texttt{gzip} and \texttt{bzip2}. 
+
+% %% Institution logo
+\vfill
+
+\begin{center}
+    \includegraphics[scale=0.6]{img/ylogo.jpg}\\
+\end{center}
+}
+{
+%%%%%%%% RIGHT COLUMN
+\section{The algorithm}
+The algorithm is relatively simple. The compression and decompression steps on a numeric data source are as follows:
+\vspace{1cm}
+\hline
+\begin{center}
+\textbf{Compression}    
+\end{center}
+\hline
+
+\texttt{
+\begin{enumerate}
+    \item HIST is a dictionary structured as \{key,value\}
+    \item For $n$ in DATAFILE:
+    \begin{itemize}
+         \item HIST[$n$]++  (Add $n$ to the hist) 
+    \end{itemize}
+     \item Delta encode HIST \textit{keys}
+     \item Pickle HIST with delta encoded keys (write to a file as binary)
+\end{enumerate}
+}
+\vspace{1cm}
+\hline
+\begin{center}
+\textbf{Decompression}    
+\end{center}
+
+\hline
+\vspace{1cm}
+\texttt{
+\begin{enumerate}
+\item HIST is a dictionary structured as\{key,value\}
+\item Read compressed binary back to HIST
+\item ``De-delta'' the delta encoded keys
+\item For each \textit{key,value} pair
+\begin{enumerate}
+    \item for value times:
+    \begin{itemize}
+        \item write \textit{key} to file
+    \end{itemize}
+\end{enumerate}
+\end{enumerate}
+}
+
+\vspace{1cm}
+\hline
+\section{Summary}
+
+\begin{itemize}
+\item This algorithms shows impressive compression rates when compared to the traditional \texttt{Unix} tools of \texttt{gzip} and \texttt{bzip2}, the obvious tradeoff is the returned data is in sort order. However, for large data-sets, where order is not a necessity, this represents an important improvement. 
+\item There is an obvious tradeoff between compression ratio and number of keys (and repeated values). The bent coin example shows that provided the size of the histogram counts covers the frequency of the numeric values in the data file, this can achieve radical compression ratios. 
+\end{itemize}
+
+\section{Further Work}
+We aim to extend this work in the following ways:
+\begin{itemize}
+\item Explore uncertainty principal of partial orders, and the tradeoff between position and compression ratios.
+\item The \texttt{juggle} tool is in no way optimised, with the size of the histogram counts a particularly important factor in the compression ratios. 
+\item We would like to make this a general purpose tool for use on a \texttt{Unix} system, therefore work is required to make this generally usable.
+\end{itemize}
+\vfill
+\bibliographystyle{abbrv}
+\bibliography{temporal}
+
+}
+\end{document}
